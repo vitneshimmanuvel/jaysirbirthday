@@ -1,4 +1,4 @@
-/* src/App.css */
+/* Updated CSS with new features */
 :root {
   --cake-brown: #f3b391;
   --cake-icing: #f8d7c4;
@@ -10,6 +10,8 @@
   --candle-purple: #9b5de5;
   --flame-orange: #ff9e6d;
   --flame-yellow: #ffea00;
+  --plate-color: #f0f0f0;
+  --plate-rim: #e0e0e0;
 }
 
 * {
@@ -173,6 +175,12 @@ p {
   flex-direction: column;
   align-items: center;
   z-index: 10;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.candle:hover {
+  transform: translateY(-5px);
 }
 
 .candle-stick {
@@ -218,14 +226,31 @@ p {
   animation: glow-pulse 1s infinite alternate;
 }
 
+.smoke {
+  position: absolute;
+  width: 8px;
+  height: 20px;
+  background: #ddd;
+  border-radius: 50%;
+  top: -15px;
+  opacity: 0;
+  animation: smoke-rise 1.5s forwards;
+}
+
 .congratulations {
-  margin-top: 3rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.15);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.7);
   border-radius: 15px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 80%;
+  max-width: 90%;
+  z-index: 100;
+  animation: pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
 }
 
 .cutting-phase {
@@ -233,14 +258,15 @@ p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 70vh;
+  height: 80vh;
+  width: 100%;
 }
 
 .cake-circle {
   position: relative;
-  width: 350px;
-  height: 350px;
-  margin: 2rem auto;
+  width: 280px;
+  height: 280px;
+  margin: 1rem auto 2rem;
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><path d='M5,35 L35,5' stroke='white' stroke-width='3' stroke-linecap='round'/><path d='M15,35 L35,15' stroke='white' stroke-width='3' stroke-linecap='round'/><path d='M25,35 L35,25' stroke='white' stroke-width='3' stroke-linecap='round'/></svg>") 16 0, auto;
 }
 
@@ -252,6 +278,11 @@ p {
   top: 0;
   transform-origin: left bottom;
   transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.cake-piece:hover:not(.cut) {
+  opacity: 0.9;
+  transform: rotate(calc(var(--rotation) + 2deg));
 }
 
 .cake-piece.cut {
@@ -267,6 +298,8 @@ p {
   border-radius: 0 100% 0 0;
   transform-origin: left bottom;
   clip-path: polygon(0 0, 100% 0, 0 100%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
 }
 
 .cake-center {
@@ -281,24 +314,67 @@ p {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
+.plate {
+  position: relative;
+  width: 280px;
+  height: 120px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.plate-design {
+  position: absolute;
+  width: 220px;
+  height: 100px;
+  background: var(--plate-color);
+  border: 8px solid var(--plate-rim);
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.plate-piece {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  animation: plate-appear 0.5s ease-out forwards;
+  z-index: 10;
+}
+
+.plate-piece .piece-inner {
+  width: 100%;
+  height: 100%;
+  background: var(--cake-brown);
+  border-radius: 0 100% 0 0;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  transform: rotate(45deg) scale(0.8);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
 .completed-screen {
   animation: zoomIn 1s ease-out;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
 }
 
-.celebrate {
-  font-size: 3rem;
-  margin-bottom: 2rem;
-  animation: colorChange 3s infinite alternate;
+.sparkles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
 }
 
-.message {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.wishes {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  animation: sparkle-fall 3s ease-in infinite;
+  box-shadow: 0 0 10px currentColor;
 }
 
 .restart-btn {
@@ -311,6 +387,9 @@ p {
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(5px);
+  margin-top: 1rem;
+  z-index: 20;
+  position: relative;
 }
 
 .restart-btn:hover {
@@ -318,7 +397,45 @@ p {
   transform: scale(1.05);
 }
 
-/* Animations */
+/* New Animations */
+@keyframes smoke-rise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.5);
+  }
+}
+
+@keyframes sparkle-fall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes plate-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Existing Animations */
 @keyframes flicker {
   0%, 100% {
     transform: scaleY(1) translateY(0);
@@ -415,13 +532,13 @@ p {
 
 @keyframes pop {
   0% {
-    transform: scale(0);
+    transform: translate(-50%, -50%) scale(0);
   }
   50% {
-    transform: scale(1.2);
+    transform: translate(-50%, -50%) scale(1.2);
   }
   100% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -463,7 +580,59 @@ p {
   }
   
   .cake-circle {
-    width: 280px;
-    height: 280px;
+    width: 240px;
+    height: 240px;
+  }
+  
+  .congratulations {
+    width: 90%;
+    padding: 1.5rem;
+  }
+  
+  .celebrate {
+    font-size: 2.2rem;
+  }
+  
+  .message {
+    font-size: 1.5rem;
+  }
+  
+  .wishes {
+    font-size: 1.2rem;
+  }
+  
+  .plate {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .cake {
+    transform: scale(0.7);
+  }
+  
+  .cake-circle {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .congratulations h2 {
+    font-size: 1.5rem;
+  }
+  
+  .congratulations p {
+    font-size: 1rem;
+  }
+  
+  .celebrate {
+    font-size: 1.8rem;
+  }
+  
+  .plate {
+    transform: scale(0.7);
   }
 }
